@@ -1,0 +1,11 @@
+"0","##Open Air Analysis"
+"0","library(openair)"
+"0","library(worldmet)"
+"0","library(openairmaps)"
+"0",""
+"0","#Find Met Data"
+"0","getMeta(lat = 41.8, lon = -71.4, returnMap = TRUE)"
+"2","Registered S3 method overwritten by 'htmlwidgets':
+  method           from         
+  print.htmlwidget tools:rstudio
+"

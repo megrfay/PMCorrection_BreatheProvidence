@@ -1,0 +1,4 @@
+"0","library(jsonlite)"
+"0","mydata <- fromJSON(""https://aqs.epa.gov/data/api/sampleData/byCounty?email=megan_fay@brown.edu&key=russetmallard73&param=61103,61104&bdate=20230301&edate=20230330&state=44&county=007"")"
+"0",""
+"0","df <- mydata[2]"

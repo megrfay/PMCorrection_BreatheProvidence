@@ -1,0 +1,34 @@
+---
+title: "09-12CW.Rmd"
+author: "Meg Fay"
+date: "2023-09-12"
+output: pdf_document
+---
+
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+
+```{r}
+source("http://www.uvm.edu/~rsingle/stat221/data/scripts-221.R")
+dat <- bookdata("ch05q02.txt")
+```
+
+```{r}
+plot <- plot(SBP ~ QUET, data=dat)  #scatterplot
+mod <- lm (SBP ~ QUET, data = dat)
+mod
+abline(mod, col=4)
+```
+The LSEs of the slope and intercept are the results of the linear model, where the LSE of the slope is 21.49 and the intercept is 70.58.
+
+```{r}
+summary(mod)
+```
+Based on output of the summary command, the p-value is 2.99e-06 and this value is lower than an alpha of 0.01. We can reject the null hypothesis that the slope of this model is zero. Within the context of the data, we are 99% confident that the relationship between 
+The slope of the relationship between these is significantly different than zero. 
+```{r}
+pred.bands(dat$SBP,dat$QUET, alpha = 0.05)
+```

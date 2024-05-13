@@ -1,0 +1,114 @@
+---
+title: "6-Month_HumidityCorrection"
+author: "Meg Fay"
+date: "2023-07-06"
+output: html_document
+---
+```{r setup, include=FALSE}
+#Library
+library(lubridate)  
+library(dplyr)
+library(tidyverse)
+library(ggpubr)
+library(openair)
+library(openairmaps)
+library(ggplot2)
+library(worldmet)
+```
+
+```{r DEM data download and clean}
+#import DEM data from file
+DEM_sensor<- read.csv("Compiled_RIDEM_Data_6.13.23.csv")
+
+#convert date
+DEM_sensor$Date <- as_datetime(DEM_sensor$Date, format =  "%Y-%m-%d %H:%M:%S")
+colnames(DEM_sensor)[1] <- "date"
+#View(DEM_sensor)
+```
+
+```{r take hourly averages of sensor data}
+#Generate Hourly averages for pm2_5_corrected, temp, rh of SENSOR 1
+
+MJF_hourly <-  All_Sensors_Corrected %>%
+  filter(Sensor == "Myron J. Francis Elementary") %>%
+  mutate(date_hourly = floor_date(date, unit = "hour"))
+
+MJF_pm2_5_corrected_hourly <- MJF_hourly %>%
+  group_by(date_hourly) %>%
+  summarise_at(vars(pm2_5_corrected), list(pm2_5_corrected = mean))
+
+MJF_rh_hourly <- MJF_hourly %>%
+  group_by(date_hourly) %>%
+  summarise_at(vars(rh), list(rh = mean))
+
+
+#Merge into new hourly dataframe
+
+MJF_hourly <- merge(MJF_pm2_5_corrected_hourly, MJF_rh_hourly, by = "date_hourly")
+
+```
+
+```{r merge datasets}
+DEM_sensor$date_hourly <- DEM_sensor$date
+PM_Data_Merge <- merge(DEM_sensor, MJF_hourly, by = "date_hourly")
+#View(PM_Data_Merge)
+write_csv(PM_Data_Merge, "PM_Data_Merge_6Month.csv")
+```
+
+```{r fitting to hygroscopic growth function}
+
+#prepping data
+x <- PM_Data_Merge$pm2_5_corrected
+y <- PM_Data_Merge$PM2_5
+RH <- PM_Data_Merge$rh 
+
+
+#test data, run if troubleshooting function
+#x <- c(2.7, 3.2, 3.5, 5.4, 7.7)
+#y <- c(2, 3, 6, 4, 3)
+#RH <- c(73, 72, 72, 71, 69)
+
+df <- data.frame(y,x,RH)
+df <- df %>% drop_na()
+#view(df)
+
+#defining the empirical formula
+hygro.eq <- function(m, k) {
+   df$x*m/(1+k/((100/df$RH)-1))
+}
+#hygro.eq(0.6, 1.4)  # testing the equation works
+
+fit = nls(y ~ hygro.eq(m, k), data = df, start=list(m=0.5, k=1))
+#print(fit)
+
+model.coefficients <- coef(fit)
+m <- as.numeric(model.coefficients[1])
+k <- as.numeric(model.coefficients[2])
+```
+
+```{r applying empirical correction formula}
+
+#create an hourly column in All_Sensors_Corrected
+All_Sensors_Corrected <-  All_Sensors_Corrected %>%
+  mutate(date_hourly = floor_date(date, unit = "hour"))
+
+#merge with RIDEM data
+All_Sensor_DEM_Merge <- merge(DEM_sensor, All_Sensors_Corrected, by= "date_hourly")
+All_Sensor_DEM_Merge$pm2_5_dry <- (All_Sensor_DEM_Merge$pm2_5_corrected)*(m/(1+k/((100/All_Sensor_DEM_Merge$rh)-1)))
+#View(Sensor_Merge_EP)
+
+PVD_PM_Cal <- subset(All_Sensor_DEM_Merge, select = c(date.y, PM2_5, date_hourly, Sensor, code, rh, pm2_5_corrected, lat, lon, pm2_5_dry))
+colnames(PVD_PM_Cal) <- c("date", "PM2_5_RIDEM", "date_hourly", "Sensor", "code", "rh", "pm2_5_corrected", "lat", "lon", "pm2_5_dry")
+#View(PVD_PM_Cal)
+
+#write csv with results
+PVD_PM_Cal_df <- as.data.frame(PVD_PM_Cal)
+PVD_PM_Cal_df$code <- sapply(PVD_PM_Cal_df$code, paste, collapse = ",")
+# Merge pm2_5 from All_Sensors_df with PVD_PM_Cal_df based on the date column
+PVD_PM_Cal_df$code <- as.character(PVD_PM_Cal_df$code)
+PVD_PM_Cal_df$date <- as.POSIXct(PVD_PM_Cal_df$date)
+All_Sensors_df$code <- as.character(All_Sensors_df$code)
+All_Sensors_df$date <- as.POSIXct(All_Sensors_df$date)
+PVD_PM_Cal_df <- full_join(PVD_PM_Cal_df, All_Sensors_df %>% select(code, date, pm2_5), by = c("code", "date"))
+write.csv(PVD_PM_Cal_df, "PVD_PM_Cal_6Month.csv")
+```

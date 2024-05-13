@@ -1,0 +1,63 @@
+---
+title: "3210cw-11-30"
+author: "Meg Fay"
+date: "2023-11-30"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+#High school and beyond (hsb2) dataset: 200 obs
+#scores on standardized tests of reading (read), writing (write), mathematics (math) and social studies (socst).
+#demographic info: gender (female), socio-economic status (ses) ethnic background (race)
+source("http://www.uvm.edu/~rsingle/stat221/data/scripts-221.R")
+dat <- otherdata("hsb2.dat")
+
+ boxplot(write ~ ses, data=dat)
+ mod <- lm(write ~ ses, data=dat)
+ anova(mod) 
+ class(dat$ses)
+ 
+#re-code SES as a character variable
+ dat$ses2 <- NULL
+ dat$ses2[dat$ses==1] <- "low"
+ dat$ses2[dat$ses==2] <- "med"
+ dat$ses2[dat$ses==3] <- "high"
+ 
+ boxplot(write ~ ses2, data=dat) #alphabetical variable ordering
+ 
+#re-code SES as a factor
+ dat$ses2 <- factor(dat$ses2, levels=c("low","med","high"))
+ class(dat$ses2)
+ 
+ boxplot(write ~ ses2, data=dat) #better variable ordering
+
+```
+
+```{r}
+ mod2 <- lm(write ~ ses2, data=dat)
+ anova(mod2) 
+```
+
+The pooled estimate of variance is the MSE or S2y|x. For this ANOVA, the pooled estimate of the variance is equal to 86.40. 
+
+```{r}
+vars = tapply(dat$write, dat$ses2, var)
+s1 <- vars[1]
+s2 <- vars[2]
+s3 <- vars[3]
+
+size = tapply(dat$write, dat$ses2, length)
+n1 <- size[1]
+n2 <- size[2]
+n3 <- size[3]
+
+MSE <- ((n1-1)*(s1) + (n2-1)*(s2) + (n3-1)*(s3))/(n1+n2+n3 -3)
+MSE
+```
+Comput 95% CI writeing for for medium SES
+
+```{r}
+mean.write = tapply(dat$write, dat$ses2, mean);names(mean.write)=NULL
+mean.write;qt(0.025, 197)
+l95 = mean.write[3]+qt(0.025,197)*sqrt(MSE/n3)
+```
