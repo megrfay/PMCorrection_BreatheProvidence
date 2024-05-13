@@ -1,4 +1,0 @@
-"0","l95 = mean.write[3]+qt(0.025,197)*sqrt(MSE/r[3])
-"
-"2","Error: object 'r' not found
-"

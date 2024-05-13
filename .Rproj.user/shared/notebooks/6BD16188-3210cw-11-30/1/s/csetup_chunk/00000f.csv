@@ -1,7 +1,0 @@
-"0","#High school and beyond (hsb2) dataset: 200 obs"
-"0","#scores on standardized tests of reading (read), writing (write), mathematics (math) and social studies (socst)."
-"0","#demographic info: gender (female), socio-economic status (ses) ethnic background (race)"
-"0","source(""http://www.uvm.edu/~rsingle/stat221/data/scripts-221.R"")"
-"0","dat <- otherdata(""hsb2.dat"")"
-"0",""
-"0"," boxplot(write ~ ses, data=dat)"
