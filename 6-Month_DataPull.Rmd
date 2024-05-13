@@ -52,7 +52,7 @@ Start_Date <- "2023-01-01" #Format:  YYYY-MM-DD
 Start_Time <- "00:00:00"   #Format:  hh:mm:ss #Enter in current time zone
 
 #right now the end date is limited by the DEM data available
-End_Date <- "2023-06-30"  #Format: YYYY-MM_DD
+End_Date <- "2023-06-13"  #Format: YYYY-MM_DD
 End_Time <- "00:00:00"    #Format: hh:mm:ss 
 
 
