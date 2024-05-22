@@ -108,11 +108,11 @@ pm_hourly_mjf <- pm_hourly_mjf %>%
 # >>> raw data <<<
 
 # create linear regression model for raw data
-lm_raw <- lm(pm2_5_raw ~ pm2_5_ridem, data = pm_hourly_mjf)
+lm_raw <- lm(pm2_5_ridem ~ pm2_5_raw, data = pm_hourly_mjf)
 summary(lm_raw)
 
 # plot raw data
-ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_raw)) +
+ggplot(pm_hourly_mjf, aes(x=pm2_5_raw, y=pm2_5_ridem)) +
   geom_bin2d(bins = 50) +
   scale_fill_distiller(palette = "Greens", direction = 1) +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "black") +
@@ -122,11 +122,11 @@ ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_raw)) +
 # >>> offset corrected data <<<
 
 # create linear regression model for corrected data
-lm_corrected <- lm(pm2_5_corrected ~ pm2_5_ridem, data = pm_hourly_mjf)
+lm_corrected <- lm(pm2_5_ridem ~ pm2_5_corrected, data = pm_hourly_mjf)
 summary(lm_corrected)
 
 # plot corrected data
-ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_corrected)) +
+ggplot(pm_hourly_mjf, aes(x=pm2_5_corrected, y=pm2_5_ridem)) +
   geom_bin2d(bins = 50) +
   scale_fill_distiller(palette = "Greens", direction = 1) +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "black") +
@@ -136,11 +136,11 @@ ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_corrected)) +
 # >>> humidity corrected data <<<
 
 # create linear regression model for corrected data
-lm_dry_corrected <- lm(pm2_5_dry_raw ~ pm2_5_ridem, data = pm_hourly_mjf)
+lm_dry_raw <- lm(pm2_5_ridem ~ pm2_5_dry_raw, data = pm_hourly_mjf)
 summary(lm_dry_raw)
 
 # plot corrected data
-ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_dry_raw)) +
+ggplot(pm_hourly_mjf, aes(x=pm2_5_dry_raw, y=pm2_5_ridem)) +
   geom_bin2d(bins = 50) +
   scale_fill_distiller(palette = "Greens", direction = 1) +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "black") +
@@ -150,11 +150,11 @@ ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_dry_raw)) +
 # >>> offset-humidity corrected data <<<
 
 # create linear regression model for corrected data
-lm_dry_corrected <- lm(pm2_5_dry_corrected ~ pm2_5_ridem, data = pm_hourly_mjf)
+lm_dry_corrected <- lm(pm2_5_ridem ~ pm2_5_dry_corrected, data = pm_hourly_mjf)
 summary(lm_dry_corrected)
 
 # plot corrected data
-ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_dry_corrected)) +
+ggplot(pm_hourly_mjf, aes(x=pm2_5_dry_corrected, y=pm2_5_ridem)) +
   geom_bin2d(bins = 50) +
   scale_fill_distiller(palette = "Greens", direction = 1) +
   geom_smooth(method = "lm", formula = y ~ x, se = FALSE, color = "black") +
@@ -162,85 +162,89 @@ ggplot(pm_hourly_mjf, aes(x=pm2_5_ridem, y=pm2_5_dry_corrected)) +
   geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black")
 
 # ----------- LM AQI BINS ------------ #
-
 # create models for each of the aqi bins
-lm_raw_good <- lm(pm2_5_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
-lm_raw_moderate <- lm(pm2_5_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
-lm_raw_usg <- lm(pm2_5_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
-lm_raw_unhealthy <- lm(pm2_5_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
+lm_raw_good <- lm(pm2_5_ridem ~ pm2_5_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
+lm_raw_moderate <- lm(pm2_5_ridem ~ pm2_5_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
+lm_raw_usg <- lm(pm2_5_ridem ~ pm2_5_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
+#lm_raw_unhealthy <- lm(pm2_5_ridem ~ pm2_5_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
 
 # print summary of each model
 summary(lm_raw_good)
 summary(lm_raw_moderate)
 summary(lm_raw_usg)
-summary(lm_raw_unhealthy)
+#summary(lm_raw_unhealthy)
 
 # create models for each of the aqi bins
-lm_corrected_good <- lm(pm2_5_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
-lm_corrected_moderate <- lm(pm2_5_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
-lm_corrected_usg <- lm(pm2_5_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
-lm_corrected_unhealthy <- lm(pm2_5_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
+lm_corrected_good <- lm(pm2_5_ridem ~ pm2_5_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
+lm_corrected_moderate <- lm(pm2_5_ridem ~ pm2_5_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
+lm_corrected_usg <- lm(pm2_5_ridem ~ pm2_5_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
+#lm_corrected_unhealthy <- lm(pm2_5_ridem ~ pm2_5_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
 
 # print summary of each model
 summary(lm_corrected_good)
 summary(lm_corrected_moderate)
 summary(lm_corrected_usg)
-summary(lm_corrected_unhealthy)
+#summary(lm_corrected_unhealthy)
 
 # create models for each of the aqi bins
-lm_dry_raw_good <- lm(pm2_5_dry_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
-lm_dry_raw_moderate <- lm(pm2_5_dry_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
-lm_dry_raw_usg <- lm(pm2_5_dry_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
-lm_dry_raw_unhealthy <- lm(pm2_5_dry_raw ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
+lm_dry_raw_good <- lm(pm2_5_ridem ~ pm2_5_dry_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
+lm_dry_raw_moderate <- lm(pm2_5_ridem ~ pm2_5_dry_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
+lm_dry_raw_usg <- lm(pm2_5_ridem ~ pm2_5_dry_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
+#lm_dry_raw_unhealthy <- lm(pm2_5_ridem ~ pm2_5_dry_raw, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
 
 # print summary of each model
 summary(lm_dry_raw_good)
 summary(lm_dry_raw_moderate)
 summary(lm_dry_raw_usg)
-summary(lm_dry_raw_unhealthy)
+#summary(lm_dry_raw_unhealthy)
 
 # create models for each of the aqi bins
-lm_dry_corrected_good <- lm(pm2_5_dry_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
-lm_dry_corrected_moderate <- lm(pm2_5_dry_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
-lm_dry_corrected_usg <- lm(pm2_5_dry_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
-lm_dry_corrected_unhealthy <- lm(pm2_5_dry_corrected ~ pm2_5_ridem, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
+lm_dry_corrected_good <- lm(pm2_5_ridem ~ pm2_5_dry_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Good"))
+lm_dry_corrected_moderate <- lm(pm2_5_ridem ~ pm2_5_dry_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Moderate"))
+lm_dry_corrected_usg <- lm(pm2_5_ridem ~ pm2_5_dry_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy for Sensitive Groups"))
+#lm_dry_corrected_unhealthy <- lm(pm2_5_ridem ~ pm2_5_dry_corrected, data = pm_hourly_mjf %>% filter(aqi_bin == "Unhealthy"))
 
 # print summary of each model
 summary(lm_dry_corrected_good)
 summary(lm_dry_corrected_moderate)
 summary(lm_dry_corrected_usg)
-summary(lm_dry_corrected_unhealthy)
+#summary(lm_dry_corrected_unhealthy)
 
 # ----------- RMSE and MEAN BIAS ------------ #
 # create function to calculate RMSE
-rmse <- function(actual, predicted) {
-  sqrt(sum((actual - predicted)^2) / length(actual))
+rmse <- function(observed, predicted) {
+  sqrt(mean((predicted - observed)^2))
 }
 
 # create function to calculate mean bias
-mean_bias <- function(actual, predicted) {
-  sum(actual - predicted) / length(actual)
+mean_bias <- function(observed, predicted) {
+  mean(predicted - observed)
 }
 
 # calculate RMSE and mean bias for raw data
-rmse_raw <- rmse(pm_hourly_mjf$pm2_5_raw, predict(lm_raw))
-mean_bias_raw <- mean_bias(pm_hourly_mjf$pm2_5_raw, predict(lm_raw))
+rmse_raw <- rmse(pm_hourly_mjf$pm2_5_ridem, predict(lm_raw))
+mean_bias_raw <- mean_bias(pm_hourly_mjf$pm2_5_ridem, predict(lm_raw))
+correlation_raw <- cor(pm_hourly_mjf$pm2_5_ridem, pm_hourly_mjf$pm2_5_raw)
 
 # calculate RMSE and mean bias for corrected data
-rmse_corrected <- rmse(pm_hourly_mjf$pm2_5_corrected, predict(lm_corrected))
-mean_bias_corrected <- mean_bias(pm_hourly_mjf$pm2_5_corrected, predict(lm_corrected))
+rmse_corrected <- rmse(pm_hourly_mjf$pm2_5_ridem, predict(lm_corrected))
+mean_bias_corrected <- mean_bias(pm_hourly_mjf$pm2_5_ridem, predict(lm_corrected))
+correlation_corrected <- cor(pm_hourly_mjf$pm2_5_ridem, pm_hourly_mjf$pm2_5_corrected)
 
 # calculate RMSE and mean bias for dry corrected data
-rmse_dry_raw <- rmse(pm_hourly_mjf$pm2_5_dry_raw, predict(lm_dry_raw))
-mean_bias_dry_raw <- mean_bias(pm_hourly_mjf$pm2_5_dry_raw, predict(lm_dry_raw))
+rmse_dry_raw <- rmse(pm_hourly_mjf$pm2_5_ridem, predict(lm_dry_raw))
+mean_bias_dry_raw <- mean_bias(pm_hourly_mjf$pm2_5_ridem, predict(lm_dry_raw))
+correlation_dry_raw <- cor(pm_hourly_mjf$pm2_5_ridem, pm_hourly_mjf$pm2_5_dry_raw)
 
 # calculate RMSE and mean bias for dry corrected data
-rmse_dry_corrected <- rmse(pm_hourly_mjf$pm2_5_dry_corrected, predict(lm_dry_corrected))
-mean_bias_dry_corrected <- mean_bias(pm_hourly_mjf$pm2_5_dry_corrected, predict(lm_dry_corrected))
+rmse_dry_corrected <- rmse(pm_hourly_mjf$pm2_5_ridem, predict(lm_dry_corrected))
+mean_bias_dry_corrected <- mean_bias(pm_hourly_mjf$pm2_5_ridem, predict(lm_dry_corrected))
+correlation_dry_corrected <- cor(pm_hourly_mjf$pm2_5_ridem, pm_hourly_mjf$pm2_5_dry_corrected)
 
 # create data frame of RMSE and mean bias
 lm_eval <- data.frame(
   model = c("Raw", "Corrected", "Dry Raw", "Dry Corrected"),
   rmse = c(rmse_raw, rmse_corrected, rmse_dry_raw, rmse_dry_corrected),
-  mean_bias = c(mean_bias_raw, mean_bias_corrected, mean_bias_dry_raw, mean_bias_dry_corrected)
+  mean_bias = c(mean_bias_raw, mean_bias_corrected, mean_bias_dry_raw, mean_bias_dry_corrected),
+  correlation = c(correlation_raw, correlation_corrected, correlation_dry_raw, correlation_dry_corrected)
 )

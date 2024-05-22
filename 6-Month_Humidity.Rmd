@@ -119,7 +119,6 @@ PVD_PM_Cal <- subset(sensor_fit_merge, select = c(lat, lon, date.y, date_hourly,
 colnames(PVD_PM_Cal) <- c("lat", "lon", "date", "date_hourly", "season", "m", "k", "Sensor", "code", "rh", "pm2_5", "pm2_5_dry", "PM2_5_RIDEM")
 #View(PVD_PM_Cal)
 
-
 #write csv with results
 PVD_PM_Cal_df <- as.data.frame(PVD_PM_Cal)
 PVD_PM_Cal_df$code <- sapply(PVD_PM_Cal_df$code, paste, collapse = ",")
