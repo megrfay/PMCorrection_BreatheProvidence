@@ -1,5 +1,5 @@
 ###########################################################
-# PM Calibration Paper: Offset Correction on Collocation  #
+# PM Calibration Paper: Data pull for collocation data    #
 # by Meg Fay                                              #
 ###########################################################
 
@@ -230,15 +230,39 @@ if (!inherits(sensor1_data, "try-error")) {
 # combine all the data into one dataframe
 All_Sensors_df <- do.call(rbind, sensor_data)
 
-
-# ----------- BREAK UP DATA BY COLLOCATION PERIOD ------------ #
-
 # Merge collocation start and end dates with the sensor data
 All_Sensors_df <- All_Sensors_df %>%
   merge(collocation, by.x = "code", by.y = "Codes")
 
-# Create dataframes for each collocation period using start dates
+# ----------- EXPORT RAW DATA ------------ #
+fileName <- paste0("C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/collocation_pm25_raw.csv")
+
+fileName #copy this to use for data visualization script
+
+All_Sensors_df <- as.data.frame(All_Sensors_df)
+All_Sensors_df$code <- sapply(All_Sensors_df$code, paste, collapse = ",") 
+# remove Sensor.y column and rename Sensor.x to Sensor using dplyr
+All_Sensors_df <- All_Sensors_df %>%
+  select(-Sensor.x) %>%
+  rename(Sensor = Sensor.y)
+  
+All_Sensors_df$Sensor <- sapply(All_Sensors_df$Sensor, "[[", 1)
+write.csv(All_Sensors_df, fileName, row.names = FALSE)
+
+
+saveRDS(sensor_data, "collocation_data.rds")
+saveRDS(sensor_info, "collocation_info.rds")
+
+# ----------- BREAK UP DATA BY COLLOCATION PERIOD ------------ #
+
+# Step 1: Create a list of dataframes for each start date
 collocation_periods <- All_Sensors_df %>%
   group_by(StartDate) %>%
   group_split()
 
+# Step 2: Break each of those lists into dataframes by sensor code
+collocation_periods_list <- lapply(collocation_periods, function(df) {
+  df %>%
+    group_by(code) %>%
+    group_split()
+})
