@@ -216,18 +216,18 @@ All_Sensors_df <- do.call(rbind, sensor_data)
 ```{r save data}
 ######EXPORT#####
 #create YYStartMonthEndMonth name for the file, totally changeable
-fileName <- paste0("C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/6month_pm25_raw.csv")
+#fileName <- paste0("C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/6month_pm25_raw.csv")
 
-fileName #copy this to use for data visualization script
+#fileName #copy this to use for data visualization script
 
-All_Sensors_df <- as.data.frame(All_Sensors_df)
-All_Sensors_df$code <- sapply(All_Sensors_df$code, paste, collapse = ",") 
-All_Sensors_df$Sensor <- sapply(All_Sensors_df$Sensor, "[[", 1)
-write.csv(All_Sensors_df, fileName, row.names = FALSE)
+#All_Sensors_df <- as.data.frame(All_Sensors_df)
+#All_Sensors_df$code <- sapply(All_Sensors_df$code, paste, collapse = ",") 
+#All_Sensors_df$Sensor <- sapply(All_Sensors_df$Sensor, "[[", 1)
+#write.csv(All_Sensors_df, fileName, row.names = FALSE)
 
 
-saveRDS(sensor_data, "sensor_data.rds")
-saveRDS(sensor_info, "sensor_info.rds")
+saveRDS(sensor_data, "C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/sensor_data.rds")
+saveRDS(sensor_info, "C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/sensor_info.rds")
 ```
 
 ```{r sensor reliability}
