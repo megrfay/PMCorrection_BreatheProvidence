@@ -63,75 +63,76 @@ collocation_merge5 <- merge(raw_pm25, collocation_data5_offset, by = c("date", "
     na.omit()
 
 # ----------- DESCRIPTIVE STATISTICS ------------ #
-# calculate the mean pm2_5 for each minute
-collocation_merge1_mean <- collocation_merge1 %>%
+# calculate the median pm2_5 for each minute
+collocation_merge1_median <- collocation_merge1 %>%
     group_by(date) %>%
-    summarise(mean_pm2_5 = mean(pm2_5, na.rm = TRUE),
-              mean_pm2_5_corrected = mean(pm2_5_corrected, na.rm = TRUE)) %>%
+    summarise(median_pm2_5 = median(pm2_5, na.rm = TRUE),
+              median_pm2_5_corrected = median(pm2_5_corrected, na.rm = TRUE)) %>%
     na.omit()
-collocation_merge2_mean <- collocation_merge2 %>%
+collocation_merge2_median <- collocation_merge2 %>%
     group_by(date) %>%
-    summarise(mean_pm2_5 = mean(pm2_5, na.rm = TRUE),
-              mean_pm2_5_corrected = mean(pm2_5_corrected, na.rm = TRUE)) %>%
+    summarise(median_pm2_5 = median(pm2_5, na.rm = TRUE),
+              median_pm2_5_corrected = median(pm2_5_corrected, na.rm = TRUE)) %>%
     na.omit()
-collocation_merge3_mean <- collocation_merge3 %>%
+collocation_merge3_median <- collocation_merge3 %>%
     group_by(date) %>%
-    summarise(mean_pm2_5 = mean(pm2_5, na.rm = TRUE),
-              mean_pm2_5_corrected = mean(pm2_5_corrected, na.rm = TRUE)) %>%
+    summarise(median_pm2_5 = median(pm2_5, na.rm = TRUE),
+              median_pm2_5_corrected = median(pm2_5_corrected, na.rm = TRUE)) %>%
     na.omit()
-collocation_merge4_mean <- collocation_merge4 %>%
+collocation_merge4_median <- collocation_merge4 %>%
     group_by(date) %>%
-    summarise(mean_pm2_5 = mean(pm2_5, na.rm = TRUE),
-              mean_pm2_5_corrected = mean(pm2_5_corrected, na.rm = TRUE)) %>%
+    summarise(median_pm2_5 = median(pm2_5, na.rm = TRUE),
+              median_pm2_5_corrected = median(pm2_5_corrected, na.rm = TRUE)) %>%
     na.omit()
-collocation_merge5_mean <- collocation_merge5 %>%
+collocation_merge5_median <- collocation_merge5 %>%
     group_by(date) %>%
-    summarise(mean_pm2_5 = mean(pm2_5, na.rm = TRUE),
-              mean_pm2_5_corrected = mean(pm2_5_corrected, na.rm = TRUE)) %>%
+    summarise(median_pm2_5 = median(pm2_5, na.rm = TRUE),
+              median_pm2_5_corrected = median(pm2_5_corrected, na.rm = TRUE)) %>%
     na.omit()
 
-# add the mean pm2_5 to the original data
-collocation_merge1 <- merge(collocation_merge1, collocation_merge1_mean, by = "date")
-collocation_merge2 <- merge(collocation_merge2, collocation_merge2_mean, by = "date")
-collocation_merge3 <- merge(collocation_merge3, collocation_merge3_mean, by = "date")
-collocation_merge4 <- merge(collocation_merge4, collocation_merge4_mean, by = "date")
-collocation_merge5 <- merge(collocation_merge5, collocation_merge5_mean, by = "date")
+# add the median pm2_5 to the original data
+collocation_merge1 <- merge(collocation_merge1, collocation_merge1_median, by = "date")
+collocation_merge2 <- merge(collocation_merge2, collocation_merge2_median, by = "date")
+collocation_merge3 <- merge(collocation_merge3, collocation_merge3_median, by = "date")
+collocation_merge4 <- merge(collocation_merge4, collocation_merge4_median, by = "date")
+collocation_merge5 <- merge(collocation_merge5, collocation_merge5_median, by = "date")
 
-# find RMSE for each sensor code against mean pm2_5
+# find RMSE for each sensor code against median pm2_5
+# Note: RMSE and bias calculations with median might not be meaningful as they are with mean
 stat1 <- collocation_merge1 %>%
     group_by(code) %>%
-    summarise(RMSE_raw = Metrics::rmse(pm2_5, mean_pm2_5),
-              RMSE_corrected = Metrics::rmse(pm2_5_corrected, mean_pm2_5_corrected),
-              bias_raw = Metrics::bias(pm2_5, mean_pm2_5),
-              bias_corrected = Metrics::bias(pm2_5_corrected, mean_pm2_5_corrected)) %>%
+    summarise(RMSE_raw = Metrics::rmse(pm2_5, median_pm2_5),
+              RMSE_corrected = Metrics::rmse(pm2_5_corrected, median_pm2_5_corrected),
+              bias_raw = Metrics::bias(pm2_5, median_pm2_5),
+              bias_corrected = Metrics::bias(pm2_5_corrected, median_pm2_5_corrected)) %>%
     na.omit()
 stat2 <- collocation_merge2 %>%
     group_by(code) %>%
-    summarise(RMSE_raw = Metrics::rmse(pm2_5, mean_pm2_5),
-              RMSE_corrected = Metrics::rmse(pm2_5_corrected, mean_pm2_5_corrected),
-              bias_raw = Metrics::bias(pm2_5, mean_pm2_5),
-              bias_corrected = Metrics::bias(pm2_5_corrected, mean_pm2_5_corrected)) %>%
+    summarise(RMSE_raw = Metrics::rmse(pm2_5, median_pm2_5),
+              RMSE_corrected = Metrics::rmse(pm2_5_corrected, median_pm2_5_corrected),
+              bias_raw = Metrics::bias(pm2_5, median_pm2_5),
+              bias_corrected = Metrics::bias(pm2_5_corrected, median_pm2_5_corrected)) %>%
     na.omit()
 stat3 <- collocation_merge3 %>%
     group_by(code) %>%
-    summarise(RMSE_raw = Metrics::rmse(pm2_5, mean_pm2_5),
-              RMSE_corrected = Metrics::rmse(pm2_5_corrected, mean_pm2_5_corrected),
-              bias_raw = Metrics::bias(pm2_5, mean_pm2_5),
-              bias_corrected = Metrics::bias(pm2_5_corrected, mean_pm2_5_corrected)) %>%
+    summarise(RMSE_raw = Metrics::rmse(pm2_5, median_pm2_5),
+              RMSE_corrected = Metrics::rmse(pm2_5_corrected, median_pm2_5_corrected),
+              bias_raw = Metrics::bias(pm2_5, median_pm2_5),
+              bias_corrected = Metrics::bias(pm2_5_corrected, median_pm2_5_corrected)) %>%
     na.omit()
 stat4 <- collocation_merge4 %>%
     group_by(code) %>%
-    summarise(RMSE_raw = Metrics::rmse(pm2_5, mean_pm2_5),
-              RMSE_corrected = Metrics::rmse(pm2_5_corrected, mean_pm2_5_corrected),
-              bias_raw = Metrics::bias(pm2_5, mean_pm2_5),
-              bias_corrected = Metrics::bias(pm2_5_corrected, mean_pm2_5_corrected)) %>%
+    summarise(RMSE_raw = Metrics::rmse(pm2_5, median_pm2_5),
+              RMSE_corrected = Metrics::rmse(pm2_5_corrected, median_pm2_5_corrected),
+              bias_raw = Metrics::bias(pm2_5, median_pm2_5),
+              bias_corrected = Metrics::bias(pm2_5_corrected, median_pm2_5_corrected)) %>%
     na.omit()
 stat5 <- collocation_merge5 %>%
     group_by(code) %>%
-    summarise(RMSE_raw = Metrics::rmse(pm2_5, mean_pm2_5),
-              RMSE_corrected = Metrics::rmse(pm2_5_corrected, mean_pm2_5_corrected),
-              bias_raw = Metrics::bias(pm2_5, mean_pm2_5),
-              bias_corrected = Metrics::bias(pm2_5_corrected, mean_pm2_5_corrected)) %>%
+    summarise(RMSE_raw = Metrics::rmse(pm2_5, median_pm2_5),
+              RMSE_corrected = Metrics::rmse(pm2_5_corrected, median_pm2_5_corrected),
+              bias_raw = Metrics::bias(pm2_5, median_pm2_5),
+              bias_corrected = Metrics::bias(pm2_5_corrected, median_pm2_5_corrected)) %>%
     na.omit()
 
 # create a data frame to store the statistics

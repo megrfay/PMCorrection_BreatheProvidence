@@ -9,7 +9,7 @@ output: html_document
 pacman::p_load(lubridate, dplyr, tidyverse, ggpubr, openair, openairmaps, ggplot2, worldmet, purrr)
 
 #import DEM data from file
-DEM_sensor<- read.csv("C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/Compiled_RIDEM_Data_6.13.23.csv")
+DEM_sensor<- read.csv("/Users/megfay/Desktop/PM Manuscript/revisions/data/Compiled_RIDEM_Data_6.13.23.csv")
 
 #convert date
 DEM_sensor$Date <- as_datetime(DEM_sensor$Date, format =  "%Y-%m-%d %H:%M:%S")
@@ -17,7 +17,7 @@ colnames(DEM_sensor)[1] <- "date"
 #View(DEM_sensor)
 
 # import baseline corrected sensor data
-All_Sensors_Corrected <- read.csv("C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/6month_pm25_offset.csv")
+All_Sensors_Corrected <- read.csv("/Users/megfay/Desktop/PM Manuscript/revisions/data/6month_pm25_offsetcorrected.csv")
 
 # convert date
 All_Sensors_Corrected$date <- as_datetime(All_Sensors_Corrected$date, format =  "%Y-%m-%d %H:%M:%S")
@@ -47,7 +47,7 @@ MJF_hourly <- merge(MJF_pm2_5_corrected_hourly, MJF_rh_hourly, by = "date_hourly
 DEM_sensor$date_hourly <- DEM_sensor$date
 PM_Data_Merge <- merge(DEM_sensor, MJF_hourly, by = "date_hourly")
 
-write_csv(PM_Data_Merge, "C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/6month_pm25_mjf_dem_merge.csv")
+write_csv(PM_Data_Merge, "/Users/megfay/Desktop/PM Manuscript/revisions/data//6month_pm25_mjf_dem_merge.csv")
 ```
 
 ```{r add seasonal variable to dataframe}
@@ -93,11 +93,15 @@ for (szn in szns) {
 ```{r applying empirical correction formula}
 
 # create an hourly column in All_Sensors_Corrected
-All_Sensors_Corrected <-  All_Sensors_Corrected %>%
+All_Sensors_hourly <-  All_Sensors_Corrected %>%
   mutate(date_hourly = floor_date(date, unit = "hour"))
 
+All_Sensor_hourly <- All_Sensors_hourly %>%
+  group_by(date_hourly, Sensor, code) %>%
+  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)))
+
 # merge with RIDEM data
-sensor_fit_merge <- merge(DEM_sensor, All_Sensors_Corrected, by= "date_hourly")
+sensor_fit_merge <- merge(DEM_sensor, All_Sensors_hourly, by = "date_hourly")
 
 # add m and k values to sensor_fit_merge based on season
 # create a month column in sensor_fit_merge
@@ -126,5 +130,5 @@ PVD_PM_Cal_df$code <- sapply(PVD_PM_Cal_df$code, paste, collapse = ",")
 PVD_PM_Cal_df$code <- as.character(PVD_PM_Cal_df$code)
 PVD_PM_Cal_df$date <- as.POSIXct(PVD_PM_Cal_df$date)
 
-write.csv(PVD_PM_Cal_df, "C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/6month_pm25_offset_humidity.csv")
+write.csv(PVD_PM_Cal_df, "/Users/megfay/Desktop/PM Manuscript/revisions/data/6month_pm25_offset_humidity.csv")
 ```

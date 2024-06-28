@@ -6,12 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include = FALSE}
-# packages
-pacman::p_load(lubridate, dplyr, tidyverse, ggpubr, openair, openairmaps, ggplot2, worldmet, 
-skimr, MVN)
-
-# read in raw data from csv
-sensor_data <- readRDS("C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/sensor_data.rds")
+pacman::p_load(lubridate, dplyr, tidyverse, ggpubr, openair, openairmaps, ggplot2, worldmet)
 ```
 
 ```{r}
@@ -23,7 +18,7 @@ sensor_hourly_data <- lapply(sensor_data, function(sensor) {
   return(sensor_hourly)
 })
 
-# Extract 10th percentile per hour for each sensor
+# Extract 5th percentile per hour for each sensor
 baseline_list <- lapply(seq_along(sensor_data), function(i) {
   sensor_hourly <- sensor_hourly_data[[i]]
   sensor_baseline <- sensor_hourly %>%
@@ -44,7 +39,6 @@ sensor_offsets <- lapply(seq_along(sensor_data), function(i) {
   sensor_offset[, offset_col] <- sensor_offset[, paste0(sensor_codes[i], "pm5pct")] - baseline_df$row_median
   return(sensor_offset)
 })
-offset_df <- Reduce(function(x, y) full_join(x, y, by = "dateHourly"), sensor_offsets)
 
 # Create dataframe with raw data and offset values for each sensor
 sensor_merge_list <- lapply(seq_along(sensor_hourly_data), function(i) {
@@ -54,9 +48,12 @@ sensor_merge_list <- lapply(seq_along(sensor_hourly_data), function(i) {
   return(select(merge_data, date, Sensor, code, pm2_5_corrected, rh, temp, lat, lon))
 })
 
-# Save the dataframes to csv files
-write.csv(baseline_df, "C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/Field Data/sensor_baselines.csv")
-write.csv(offset_df, "C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/Field Data/sensor_offsets.csv")
+sensor_merge_list <- lapply(seq_along(sensor_hourly_data), function(i) {
+  merge_data <- merge(sensor_hourly_data[[i]], sensor_offsets[[i]], by = "dateHourly")
+  offset_col <- paste0(sensor_codes[[i]], "offset")
+  merge_data$pm2_5_corrected <- merge_data$pm2_5 - merge_data[, offset_col]
+  return(select(merge_data, date, Sensor, code, pm2_5_corrected, rh, temp, lat, lon))
+})
 
 # Combine all sensor merge dataframes
 All_Sensors_Corrected <- Reduce(full_join, sensor_merge_list)
@@ -64,7 +61,12 @@ All_Sensors_Corrected$Sensor <- as.character(All_Sensors_Corrected$Sensor) #make
 ```
 
 ```{r}
-# write offset-corrected data to csv
-All_Sensors_Corrected$code <- sapply(All_Sensors_Corrected$code, as.character)
-#write.csv(All_Sensors_Corrected, "C:/Users/mrfay/OneDrive - University of Vermont/Desktop/BPVD/PM/data/6month_pm25_offset.csv")
+# save the corrected data
+outdir <- "/Users/megfay/Desktop/PM Manuscript/revisions/data"
+fileName <- "6month_pm25_offsetcorrected.csv"
+filePath <- file.path(outdir, fileName)
+
+All_Sensors_Corrected_df <- as.data.frame(All_Sensors_Corrected)
+All_Sensors_Corrected_df$code <- sapply(All_Sensors_Corrected_df$code, paste, collapse = ",") 
+write.csv(All_Sensors_Corrected_df, filePath, row.names = FALSE)
 ```
