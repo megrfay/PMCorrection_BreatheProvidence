@@ -1,5 +1,3 @@
-# PMCorrectionBPVD
-
 <div align="center">
     <h1>Code for "Low-Cost Sensor Calibration Methodology and Preservation of Spatial Variability for Fine Particulate Matter in the Breathe Providence Network"</h1>
     <h2>Institute at Brown for Environment and Society</h2>
